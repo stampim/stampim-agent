@@ -25,8 +25,6 @@ not need a dedicated developer per agent.
 panel appears over your interface. No UI to build. On top of it comes our display
 layer: highlighting the right object on screen, cards, dashboards, voice input.
 
-**Embedding demo.** [Video, 30 s](demo/stampim-agent-demo.mp4) · [GIF](demo/stampim-agent-demo.gif)
-
 **Seamless sign-in.** The agent has no privileges of its own in your system. When
 embedded with a script tag, the panel runs in the employee's browser: it reads the
 visible page and, if your API is connected, calls it from the same browser on
