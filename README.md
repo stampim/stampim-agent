@@ -44,7 +44,7 @@ reminders live on the server and do not need an open browser tab.
 
 ## Independent benchmarks
 
-We test the agent on the open tau2 benchmarks (retail and airline so far) using the
+We test the agent on the open tau2 benchmarks (retail, airline, telecom) using the
 open Exgentic harness — the same one used by the Open Agent Leaderboard. In these
 runs our agent is called **stampim-agent**.
 
@@ -64,6 +64,8 @@ leaderboard.
 | tau2 retail | tool_calling, same model | 0.798 | 114 | 10.25 | $0.0113 | $0.0117 |
 | tau2 airline | **stampim-agent** | **0.560** | 50 | 13.90 | $0.0112 | $0.0117 |
 | tau2 airline | tool_calling, same model | 0.560 | 50 | 9.34 | $0.0109 | $0.0113 |
+| tau2 telecom | **stampim-agent** | **0.789** | 114 | 16.85 | $0.0068 | $0.0085 |
+| tau2 telecom | tool_calling, same model | 0.825 | 114 | 15.43 | $0.0209 | $0.0227 |
 
 "Total cost" includes the user simulator; "agent cost" is the agent's work only.
 
@@ -71,7 +73,9 @@ On tau2 retail stampim-agent scores **0.789 vs 0.798** for tool_calling on the s
 model and costs **1.9 times less** per task on the agent: $0.0060 vs $0.0113. On
 airline the score is equal — **0.560 for both** — and the cost is nearly equal:
 $0.0112 vs $0.0109. The retail cost advantage does not carry over to airline, and
-we show it as it is.
+we show it as it is. On telecom stampim-agent scores **0.789 vs 0.825** (4 tasks out
+of 114 in a single attempt — within run-to-run noise) and costs **3.1 times less**
+on the agent: $0.0068 vs $0.0209.
 
 ### For reference — the public table
 
@@ -87,6 +91,8 @@ the same column.
 | tau2 retail | tool_calling | claude-opus-4-5 | 0.78 | 11.33 | $0.467 |
 | tau2 retail | claude_code | DeepSeek-V3.2 | 0.65 | 12.51 | $0.0436 |
 | tau2 airline | tool_calling | DeepSeek-V3.2 | 0.56 | 15.28 | $0.0340 |
+| tau2 telecom | smolagents_code | gemini-3-pro-preview | 0.88 | 12.71 | $0.346 |
+| tau2 telecom | tool_calling | DeepSeek-V3.2 | 0.71 | 18.11 | $0.0494 |
 
 The Claude Opus rows score 0.78–0.85 at $0.47–1.60 per task. stampim-agent at 0.789
 costs $0.0060 — **78–266 times less**; against claude_code on Claude Opus the gap

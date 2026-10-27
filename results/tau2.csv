@@ -3,3 +3,5 @@ tau2_retail,stampim-agent,deepseek-flash,1,114,90,0.7895,13.08,13,29,0.6845,0.04
 tau2_retail,tool_calling,deepseek-flash,1,114,91,0.7982,10.25,10,24,1.2891,0.0480,1.3372,0.01131,0.01173,"DB-state judge; NL judge not called; max_steps=150; run locally via Exgentic; not submitted"
 tau2_airline,stampim-agent,deepseek-flash,1,50,28,0.5600,13.90,12.5,30,0.56103,0.02197,0.58300,0.01122,0.01166,"DB-state judge; nl_assertions present but judge not called; max_steps=16; 7 NL-only tasks pass trivially; not submitted"
 tau2_airline,tool_calling,deepseek-flash,1,50,28,0.5600,9.34,8.5,18,0.54515,0.02043,0.56558,0.01090,0.01131,"DB-state judge; nl_assertions present but judge not called; max_steps=150; 7 NL-only tasks pass trivially; not submitted"
+tau2_telecom,stampim-agent,deepseek-flash,1,114,90,0.7895,16.85,16.0,33,0.7764,0.1975,0.9739,0.00681,0.00854,"DB-state judge; no nl_assertions in telecom; max_steps=16; run locally via Exgentic; not submitted"
+tau2_telecom,tool_calling,deepseek-flash,1,114,94,0.8246,15.43,15.0,33,2.3822,0.1996,2.5818,0.02090,0.02265,"DB-state judge; no nl_assertions in telecom; max_steps=150; run locally via Exgentic; not submitted"
