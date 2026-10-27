@@ -10,7 +10,7 @@ We embed AI agents into existing corporate systems, applications and websites.
 No rewrite of your system and no separate portal: the agent shows up where people
 already work.
 
-Website: https://stampim.su/
+Website: https://stampim.su/v3/en/
 Contact: https://t.me/agent_team_ai
 
 ## As many agents as you need
