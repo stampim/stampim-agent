@@ -1,0 +1,5 @@
+benchmark,agent,model,trials,tasks_total,tasks_succeeded,score,steps_avg,steps_median,steps_max,agent_cost_usd,simulator_cost_usd,total_cost_usd,agent_cost_per_task_usd,total_cost_per_task_usd,conditions
+tau2_retail,stampim-agent,deepseek-flash,1,114,90,0.7895,13.08,13,29,0.6845,0.0487,0.7332,0.00600,0.00643,"DB-state judge; NL judge not called; max_steps=16; run locally via Exgentic; not submitted"
+tau2_retail,tool_calling,deepseek-flash,1,114,91,0.7982,10.25,10,24,1.2891,0.0480,1.3372,0.01131,0.01173,"DB-state judge; NL judge not called; max_steps=150; run locally via Exgentic; not submitted"
+tau2_airline,stampim-agent,deepseek-flash,1,50,28,0.5600,13.90,12.5,30,0.56103,0.02197,0.58300,0.01122,0.01166,"DB-state judge; nl_assertions present but judge not called; max_steps=16; 7 NL-only tasks pass trivially; not submitted"
+tau2_airline,tool_calling,deepseek-flash,1,50,28,0.5600,9.34,8.5,18,0.54515,0.02043,0.56558,0.01090,0.01131,"DB-state judge; nl_assertions present but judge not called; max_steps=150; 7 NL-only tasks pass trivially; not submitted"

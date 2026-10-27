@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280, initial-scale=1">
+<title>One core. Any profession. One click.</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #ffffff; overflow: hidden; }
+  #stage { display: block; width: 1280px; height: 720px; }
+  text { font-family: "Segoe UI", "Arial", sans-serif; }
+</style>
+</head>
+<body>
+<svg id="stage" width="1280" height="720" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#111" stroke-width="1.5" opacity="0.55"/>
+    </pattern>
+    <filter id="rough" x="-1%" y="-1%" width="102%" height="102%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="11" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+
+    <clipPath id="hopperClip">
+      <rect x="212" y="138" width="76" height="60" rx="10"/>
+    </clipPath>
+    <clipPath id="machineClip">
+      <path d="M162 68 H338 Q350 68 350 80 L296 198 Q294 210 282 210 H218 Q206 210 204 198 L150 80 Q150 68 162 68 Z"/>
+    </clipPath>
+    <clipPath id="beltInClip"><rect x="20" y="410" width="628" height="16" rx="8"/></clipPath>
+    <clipPath id="beltOutClip"><rect x="696" y="410" width="574" height="16" rx="8"/></clipPath>
+    <clipPath id="beltFeedClip"><rect x="18" y="588" width="1244" height="14" rx="7"/></clipPath>
+
+    <!-- profession glyphs: 24x24 line icons, stroke currentColor -->
+    <symbol id="ic-request" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 13h4.6l1.5 3h3.8l1.5-3H20"/>
+        <path d="M4 13V6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5V13v5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18z"/>
+      </g>
+    </symbol>
+    <symbol id="ic-accountant" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5.5" y="3.5" width="13" height="17" rx="2"/>
+        <path d="M8.5 7h7v3h-7z"/>
+        <path d="M9 14.2h.01M12 14.2h.01M15 14.2h.01M9 17.4h.01M12 17.4h.01M15 17.4h.01" stroke-width="2.8"/>
+      </g>
+    </symbol>
+    <symbol id="ic-procurement" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 4h2.2l2.3 10.7a2 2 0 0 0 2 1.6h7.4a2 2 0 0 0 2-1.5L21 7.5H6"/>
+        <circle cx="9.6" cy="20" r="1.4"/>
+        <circle cx="17.4" cy="20" r="1.4"/>
+      </g>
+    </symbol>
+    <symbol id="ic-support" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 13.5v-2a7.5 7.5 0 0 1 15 0v2"/>
+        <path d="M4.5 13.5A2 2 0 0 1 6.5 12h1.2v6H6.5a2 2 0 0 1-2-2z"/>
+        <path d="M19.5 13.5a2 2 0 0 0-2-1.5h-1.2v6h1.2a2 2 0 0 0 2-2z"/>
+        <path d="M12 19.5v1h-3"/>
+      </g>
+    </symbol>
+    <symbol id="ic-warehouse" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z"/>
+        <path d="M4 7.5 12 11l8-3.5"/>
+        <path d="M12 11v9"/>
+      </g>
+    </symbol>
+    <symbol id="ic-sales" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3.5" y="8" width="17" height="11" rx="2"/>
+        <path d="M9 8V6.5A1.5 1.5 0 0 1 10.5 5h3A1.5 1.5 0 0 1 15 6.5V8"/>
+        <path d="M3.5 12.5h17"/>
+      </g>
+    </symbol>
+  </defs>
+
+  <rect x="0" y="0" width="1280" height="720" fill="#ffffff"/>
+
+  <!-- ================= static hand-drawn scenery ================= -->
+  <g id="staticArt" filter="url(#rough)">
+    <!-- ceiling beam -->
+    <rect x="40" y="12" width="430" height="16" rx="8" fill="#fff" stroke="#111" stroke-width="4"/>
+    <line x1="62" y1="20" x2="448" y2="20" stroke="#111" stroke-width="1.6" stroke-dasharray="14 10" opacity="0.5"/>
+    <rect x="186" y="26" width="12" height="38" rx="4" fill="#fff" stroke="#111" stroke-width="3.5"/>
+    <rect x="302" y="26" width="12" height="38" rx="4" fill="#fff" stroke="#111" stroke-width="3.5"/>
+
+    <!-- machine: body, top plate, throat (v3 replaced the teapot vessel) -->
+    <path d="M162 68 H338 Q350 68 350 80 L296 198 Q294 210 282 210 H218 Q206 210 204 198 L150 80 Q150 68 162 68 Z"
+          fill="#fff" stroke="#111" stroke-width="5"/>
+    <path d="M162 68 H338 Q350 68 350 80 L296 198 Q294 210 282 210 H218 Q206 210 204 198 L150 80 Q150 68 162 68"
+          fill="none" stroke="#111" stroke-width="1.8" opacity="0.4" transform="translate(3,3)"/>
+    <g clip-path="url(#machineClip)">
+      <rect x="196" y="192" width="108" height="18" fill="url(#hatch)" opacity="0.4"/>
+    </g>
+    <rect x="158" y="52" width="184" height="16" rx="8" fill="#fff" stroke="#111" stroke-width="4"/>
+    <circle cx="188" cy="60" r="2.6" fill="#111"/>
+    <circle cx="250" cy="60" r="2.6" fill="#111"/>
+    <circle cx="312" cy="60" r="2.6" fill="#111"/>
+    <path d="M225 210 L229 240 L271 240 L275 210 Z" fill="#fff" stroke="#111" stroke-width="4"/>
+
+    <!-- crank: bracket, wheel, motion arcs -->
+    <rect x="330" y="104" width="40" height="14" rx="6" fill="#fff" stroke="#111" stroke-width="3.5"/>
+    <circle cx="405" cy="112" r="37" fill="#fff" stroke="#111" stroke-width="5"/>
+    <circle cx="405" cy="112" r="29" fill="none" stroke="#111" stroke-width="1.5" stroke-dasharray="6 7" opacity="0.4"/>
+    <circle cx="405" cy="112" r="5" fill="#111"/>
+    <path d="M374 78 A 47 47 0 0 1 436 78" fill="none" stroke="#111" stroke-width="2.4" stroke-dasharray="7 8" opacity="0.5"/>
+    <path d="M436 146 A 47 47 0 0 1 374 146" fill="none" stroke="#111" stroke-width="2.4" stroke-dasharray="7 8" opacity="0.5"/>
+
+    <!-- conveyor belts + frames -->
+    <rect x="-10" y="408" width="680" height="20" rx="10" fill="#fff" stroke="#111" stroke-width="4"/>
+    <rect x="676" y="408" width="614" height="20" rx="10" fill="#fff" stroke="#111" stroke-width="4"/>
+    <rect x="-10" y="432" width="680" height="12" rx="6" fill="url(#hatch)" stroke="#111" stroke-width="3"/>
+    <rect x="676" y="432" width="614" height="12" rx="6" fill="url(#hatch)" stroke="#111" stroke-width="3"/>
+
+    <!-- profession feed belt -->
+    <rect x="-10" y="586" width="1300" height="18" rx="9" fill="#fff" stroke="#111" stroke-width="4"/>
+    <rect x="-10" y="608" width="1300" height="10" rx="5" fill="url(#hatch)" stroke="#111" stroke-width="3"/>
+  </g>
+
+  <!-- ================= rollers (crisp, above stripes) ================= -->
+  <g id="rollers">
+    <circle cx="14" cy="418" r="14" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="14" cy="418" r="3" fill="#111"/>
+    <circle cx="654" cy="418" r="14" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="654" cy="418" r="3" fill="#111"/>
+    <circle cx="686" cy="418" r="14" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="686" cy="418" r="3" fill="#111"/>
+    <circle cx="1266" cy="418" r="14" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="1266" cy="418" r="3" fill="#111"/>
+    <circle cx="14" cy="595" r="13" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="14" cy="595" r="3" fill="#111"/>
+    <circle cx="1266" cy="595" r="13" fill="#fff" stroke="#111" stroke-width="4"/><circle cx="1266" cy="595" r="3" fill="#111"/>
+    <rect x="668" y="426" width="8" height="20" rx="3" fill="#111"/>
+  </g>
+
+  <!-- ================= dynamic: belts, hopper life, stopper ================= -->
+  <g clip-path="url(#beltInClip)"><g id="stripesIn"></g></g>
+  <g clip-path="url(#beltOutClip)"><g id="stripesOut"></g></g>
+  <g clip-path="url(#beltFeedClip)"><g id="stripesFeed"></g></g>
+
+  <g id="hopperMinis" clip-path="url(#hopperClip)"></g>
+  <!-- porthole frame and name plate sit above the queue of blanks -->
+  <rect x="212" y="138" width="76" height="60" rx="10" fill="none" stroke="#111" stroke-width="4"/>
+  <g id="namePlate">
+    <rect x="172" y="84" width="156" height="40" rx="8" fill="#fff" stroke="#111" stroke-width="4"/>
+    <text x="250" y="112" text-anchor="middle" font-size="21" font-weight="700" fill="#111">Stampim agent</text>
+  </g>
+
+  <g id="crankArm">
+    <line x1="405" y1="112" x2="450" y2="112" stroke="#111" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="450" cy="112" r="11" fill="#111" stroke="#fff" stroke-width="2"/>
+  </g>
+
+  <g id="gateLeft"><rect x="0" y="-4" width="22" height="8" rx="4" fill="#111"/></g>
+  <g id="gateRight"><rect x="-22" y="-4" width="22" height="8" rx="4" fill="#111"/></g>
+
+  <g id="stopper" style="opacity:0">
+    <rect x="-5" y="-36" width="10" height="36" rx="4" fill="#111"/>
+    <rect x="-12" y="-42" width="24" height="9" rx="4" fill="#111"/>
+  </g>
+
+  <!-- ================= feed slots, flying tile, agents, effects ================= -->
+  <g id="slotsLayer"></g>
+  <g id="flyLayer"></g>
+  <g id="agentsLayer"></g>
+  <g id="fxLayer"></g>
+
+  <text id="tagline" x="640" y="691" text-anchor="middle" font-size="30" font-weight="700" fill="#111"></text>
+</svg>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- language and professions ----------
+  var params = new URLSearchParams(location.search);
+  var LANG = params.get("lang") === "ru" ? "ru" : "en";
+  var RECORD = params.get("record") === "1";
+  document.documentElement.lang = LANG;
+
+  var TXT = {
+    en: {
+      tag: "One core. Any profession. One click.",
+      click: "*CLICK!*",
+      prof: [
+        ["Request", "intake"],
+        ["Accountant"],
+        ["Procurement"],
+        ["Support", "operator"],
+        ["Warehouse", "clerk"],
+        ["Sales", "assistant"]
+      ]
+    },
+    ru: {
+      tag: "Одно ядро. Любая профессия. Один щелчок.",
+      click: "«ЩЁЛК!»",
+      prof: [
+        ["Приёмщик", "заявок"],
+        ["Бухгалтер"],
+        ["Снабженец"],
+        ["Оператор", "поддержки"],
+        ["Кладовщик"],
+        ["Помощник", "продаж"]
+      ]
+    }
+  }[LANG];
+
+  var KEYS = ["request", "accountant", "procurement", "support", "warehouse", "sales"];
+  var PROF = KEYS.map(function (key, i) {
+    return { key: key, lines: TXT.prof[i], label: TXT.prof[i].join(" ") };
+  });
+
+  // ---------- constants (all periodic) ----------
+  var CYCLE = 2.5;              // one crank revolution, seconds
+  var CYCLES = 6;               // six professions per loop
+  var TOTAL = CYCLE * CYCLES;   // 15.0 s
+  var FALL_END = 0.16;
+  var LAND_END = 0.19;
+  var RIDE_END = 0.49;
+  var CLICK_P  = 0.55;
+  var MERGE_END = 0.66;
+  var CHIP_P = 0.70;
+  var CHIP_FULL = 0.74;
+  var EXIT_START = 1.22;
+  var EXIT_SPEED = 420;         // px per second, slower than the incoming belt
+  var AGENT_LAND_X = 250;
+  var AGENT_CLICK_X = 640;
+  var BELT_TOP = 408;
+
+  var TILE_S = 180;
+  var TILE_X0 = AGENT_CLICK_X + CLICK_P * TILE_S;
+  var TILE_CY = 538;
+  var CLICK_X = 700;
+  var CLICK_Y = 558;
+
+  var IN_SPEED = 1300;          // px per cycle = 520 px/s (agent ride 390 px / 0.30 cycle)
+  var OUT_SPEED = 1050;         // px per cycle = 420 px/s (slower than incoming)
+  var FEED_SPEED = TILE_S;      // one tile per revolution
+  var IN_STRIPE = 130, OUT_STRIPE = 105, FEED_STRIPE = 36;
+
+  var CHIP_HALF = 160;
+  var A_END = EXIT_START + (1280 + CHIP_HALF - AGENT_CLICK_X) / (EXIT_SPEED * CYCLE);
+
+  var NS = "http://www.w3.org/2000/svg";
+  function $(id) { return document.getElementById(id); }
+  function el(name, attrs) {
+    var n = document.createElementNS(NS, name);
+    if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+  function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+  function lerp(a, b, u) { return a + (b - a) * u; }
+  function seg(p, a, b) { return clamp((p - a) / (b - a), 0, 1); }
+  function smooth(u) { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); }
+  function easeInQuad(u) { u = clamp(u, 0, 1); return u * u; }
+  function easeOutCubic(u) { u = clamp(u, 0, 1); return 1 - Math.pow(1 - u, 3); }
+  function easeInOutCubic(u) { u = clamp(u, 0, 1); return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; }
+  function easeOutBack(u) {
+    u = clamp(u, 0, 1);
+    var c1 = 1.70158, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2);
+  }
+  function mod(n, m) { return ((n % m) + m) % m; }
+
+  // ---------- static text ----------
+  var tagline = $("tagline");
+  tagline.textContent = TXT.tag;
+  document.title = TXT.tag;
+
+  // ---------- belt stripes ----------
+  function buildStripes(layer, from, to, step, y, h) {
+    for (var x = from; x <= to; x += step) {
+      layer.appendChild(el("line", {
+        x1: x, y1: y, x2: x, y2: y + h,
+        stroke: "#111", "stroke-width": 3, "stroke-linecap": "round", opacity: 0.75
+      }));
+    }
+  }
+  buildStripes($("stripesIn"), -260, 1700, IN_STRIPE, 412, 12);
+  buildStripes($("stripesOut"), -260, 1700, OUT_STRIPE, 412, 12);
+  buildStripes($("stripesFeed"), -260, 1700, FEED_STRIPE, 590, 10);
+
+  // ---------- hopper queue ----------
+  (function buildMinis() {
+    var layer = $("hopperMinis");
+    [192, 156, 120, 84].forEach(function (feet, idx) {
+      var g = el("g", { "data-feet": feet, "data-phase": idx * 1.7 });
+      g.appendChild(el("circle", { cx: "250", cy: feet - 34, r: "8", fill: "#ececec", stroke: "#111", "stroke-width": "3" }));
+      g.appendChild(el("rect", { x: "238", y: feet - 26, width: "24", height: "26", rx: "8", fill: "#ececec", stroke: "#111", "stroke-width": "3" }));
+      layer.appendChild(g);
+    });
+  })();
+
+  // ---------- feed slots ----------
+  var SLOT_MIN = -8, SLOT_MAX = 15;
+  var slots = [];
+  (function buildSlots() {
+    var layer = $("slotsLayer");
+    for (var i = SLOT_MIN; i <= SLOT_MAX; i++) {
+      var pr = PROF[mod(i, PROF.length)];
+      var g = el("g");
+      g.innerHTML =
+        '<rect x="-78" y="490" width="156" height="96" rx="16" fill="none" stroke="#111" stroke-width="2" ' +
+          'stroke-dasharray="7 7" opacity="0.4"/>' +
+        '<g class="tile">' +
+          '<rect class="tileRect" x="-78" y="490" width="156" height="96" rx="16" fill="#fff" stroke="#111" stroke-width="4"/>' +
+          '<circle class="tileIconBg" cx="0" cy="514" r="17" fill="#111"/>' +
+          '<use class="tileIcon" x="-11" y="503" width="22" height="22" href="#ic-' + pr.key + '" style="color:#fff"/>' +
+          '<text class="tileT1" x="0" y="' + (pr.lines.length === 1 ? 562 : 551) + '" text-anchor="middle" ' +
+            'font-size="20" font-weight="700" fill="#111">' + pr.lines[0] + '</text>' +
+          (pr.lines.length > 1
+            ? '<text class="tileT2" x="0" y="574" text-anchor="middle" font-size="20" font-weight="700" fill="#111">' + pr.lines[1] + '</text>'
+            : "") +
+        '</g>';
+      layer.appendChild(g);
+      slots.push({
+        i: i, pr: pr, g: g,
+        tile: g.querySelector(".tile"),
+        rect: g.querySelector(".tileRect"),
+        iconBg: g.querySelector(".tileIconBg"),
+        icon: g.querySelector(".tileIcon"),
+        texts: Array.prototype.slice.call(g.querySelectorAll("text")),
+        target: false
+      });
+    }
+  })();
+
+  // ---------- flying tiles ----------
+  var flyGroups = {};
+  (function buildFly() {
+    var layer = $("flyLayer");
+    PROF.forEach(function (pr) {
+      var g = el("g", { style: "display:none" });
+      g.innerHTML =
+        '<rect x="-78" y="-48" width="156" height="96" rx="16" fill="#111" stroke="#111" stroke-width="4"/>' +
+        '<circle cx="0" cy="-22" r="17" fill="#fff"/>' +
+        '<use x="-11" y="-33" width="22" height="22" href="#ic-' + pr.key + '" style="color:#111"/>' +
+        '<text x="0" y="' + (pr.lines.length === 1 ? 26 : 15) + '" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">' + pr.lines[0] + '</text>' +
+        (pr.lines.length > 1
+          ? '<text x="0" y="38" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">' + pr.lines[1] + '</text>'
+          : "");
+      layer.appendChild(g);
+      flyGroups[pr.key] = g;
+    });
+  })();
+
+  // ---------- agents (one group per profession) ----------
+  var ATTR = {
+    request:
+      '<rect x="-18" y="-26" width="36" height="50" rx="6" fill="#fff" stroke="#111" stroke-width="4"/>' +
+      '<line x1="-10" y1="-13" x2="10" y2="-13" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>' +
+      '<line x1="-10" y1="-4" x2="10" y2="-4" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>' +
+      '<line x1="-10" y1="5" x2="3" y2="5" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>' +
+      '<circle cx="11" cy="16" r="2.4" fill="#111"/>',
+    accountant:
+      '<rect x="-16" y="-24" width="32" height="44" rx="5" fill="#fff" stroke="#111" stroke-width="4"/>' +
+      '<rect x="-10" y="-17" width="20" height="10" rx="2" fill="#111"/>' +
+      '<circle cx="-7" cy="1" r="2.2" fill="#111"/><circle cx="0" cy="1" r="2.2" fill="#111"/><circle cx="7" cy="1" r="2.2" fill="#111"/>' +
+      '<circle cx="-7" cy="9" r="2.2" fill="#111"/><circle cx="0" cy="9" r="2.2" fill="#111"/><circle cx="7" cy="9" r="2.2" fill="#111"/>' +
+      '<rect x="-8" y="13" width="16" height="4" rx="2" fill="#111"/>',
+    procurement:
+      '<path d="M -10 -30 L -10 -46 L 8 -46" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M -6 -36 L 30 -36 L 24 -16 L 2 -16 Z" fill="#fff" stroke="#111" stroke-width="4" stroke-linejoin="round"/>' +
+      '<circle cx="4" cy="-6" r="6" fill="#fff" stroke="#111" stroke-width="4"/>' +
+      '<circle cx="22" cy="-6" r="6" fill="#fff" stroke="#111" stroke-width="4"/>',
+    support:
+      '<path d="M -24 -112 C -24 -140 24 -140 24 -112" fill="none" stroke="#111" stroke-width="6" stroke-linecap="round"/>' +
+      '<rect x="-34" y="-120" width="14" height="26" rx="6" fill="#fff" stroke="#111" stroke-width="4"/>' +
+      '<rect x="20" y="-120" width="14" height="26" rx="6" fill="#fff" stroke="#111" stroke-width="4"/>' +
+      '<path d="M 34 -100 C 34 -84 20 -82 12 -84" fill="none" stroke="#111" stroke-width="3.4" stroke-linecap="round"/>',
+    warehouse:
+      '<rect x="-22" y="-26" width="44" height="40" rx="3" fill="#fff" stroke="#111" stroke-width="4"/>' +
+      '<line x1="0" y1="-26" x2="0" y2="14" stroke="#111" stroke-width="2.6"/>' +
+      '<path d="M -22 -26 L 0 -10 L 22 -26" fill="none" stroke="#111" stroke-width="2.6"/>',
+    sales:
+      '<rect x="-21" y="-14" width="42" height="30" rx="5" fill="#fff" stroke="#111" stroke-width="4"/>' +
+      '<path d="M -8 -14 C -8 -26 8 -26 8 -14" fill="none" stroke="#111" stroke-width="4"/>' +
+      '<rect x="-19" y="-2" width="8" height="6" rx="1.5" fill="#111"/>' +
+      '<rect x="11" y="-2" width="8" height="6" rx="1.5" fill="#111"/>'
+  };
+
+  var ATTR_ANCHOR = {
+    request: [50, -44], accountant: [54, -42], procurement: [56, -36],
+    support: [0, -116], warehouse: [56, -40], sales: [56, -42]
+  };
+
+  var agentGroups = {};
+  (function buildAgents() {
+    var layer = $("agentsLayer");
+    PROF.forEach(function (pr) {
+      var g = el("g", { style: "display:none" });
+      var ax = ATTR_ANCHOR[pr.key][0], ay = ATTR_ANCHOR[pr.key][1];
+      g.innerHTML =
+        '<ellipse class="shadow" cx="0" cy="3" rx="40" ry="7" fill="url(#hatch)" opacity="0.55"/>' +
+        '<g class="fig">' +
+          '<rect class="leg" x="-17" y="-16" width="12" height="16" rx="5" fill="#ececec" stroke="#111" stroke-width="3.5"/>' +
+          '<rect class="leg" x="5" y="-16" width="12" height="16" rx="5" fill="#ececec" stroke="#111" stroke-width="3.5"/>' +
+          '<path d="M -26 -62 L -40 -40" stroke="#111" stroke-width="9" stroke-linecap="round"/>' +
+          '<path d="M 26 -62 L 40 -40" stroke="#111" stroke-width="9" stroke-linecap="round"/>' +
+          '<rect class="torso" x="-28" y="-82" width="56" height="70" rx="20" fill="#ececec" stroke="#111" stroke-width="4.5"/>' +
+          '<circle class="head" cx="0" cy="-100" r="23" fill="#ececec" stroke="#111" stroke-width="4.5"/>' +
+          '<g class="eyes">' +
+            '<circle cx="-8" cy="-103" r="3" fill="#111"/><circle cx="8" cy="-103" r="3" fill="#111"/>' +
+          '</g>' +
+          '<g class="eyesShut" style="display:none">' +
+            '<line x1="-12" y1="-103" x2="-4" y2="-103" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>' +
+            '<line x1="4" y1="-103" x2="12" y2="-103" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>' +
+          '</g>' +
+          '<path class="smile" d="M -8 -90 Q 0 -83 8 -90" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round" style="display:none"/>' +
+        '</g>' +
+        '<g class="badge" style="display:none">' +
+          '<circle r="17" fill="#111" stroke="#111" stroke-width="4"/>' +
+          '<use x="-11" y="-11" width="22" height="22" href="#ic-' + pr.key + '" style="color:#fff"/>' +
+        '</g>' +
+        '<g class="attr" style="display:none">' +
+          '<g transform="translate(' + ax + ',' + ay + ')">' + ATTR[pr.key] + '</g>' +
+        '</g>' +
+        '<g class="chip" opacity="0">' +
+          '<rect x="-160" y="-22" width="320" height="44" rx="22" fill="#fff" stroke="#111" stroke-width="4"/>' +
+          '<text x="0" y="7" text-anchor="middle" font-size="21" font-weight="700" fill="#111">' + pr.label + '</text>' +
+        '</g>';
+      layer.appendChild(g);
+      agentGroups[pr.key] = {
+        g: g,
+        torso: g.querySelector(".torso"),
+        head: g.querySelector(".head"),
+        legs: Array.prototype.slice.call(g.querySelectorAll(".leg")),
+        eyes: g.querySelector(".eyes"),
+        eyesShut: g.querySelector(".eyesShut"),
+        smile: g.querySelector(".smile"),
+        badge: g.querySelector(".badge"),
+        attr: g.querySelector(".attr"),
+        chip: g.querySelector(".chip"),
+        ax: ax, ay: ay,
+        merged: null
+      };
+    });
+  })();
+
+  // ---------- click star ----------
+  var fx = $("fxLayer");
+  var star = el("g", { style: "display:none" });
+  (function buildStar() {
+    var pts = [];
+    for (var k = 0; k < 20; k++) {
+      var r = k % 2 === 0 ? 36 : 16;
+      var a = -Math.PI / 2 + Math.PI * k / 10;
+      pts.push((Math.cos(a) * r).toFixed(2) + "," + (Math.sin(a) * r).toFixed(2));
+    }
+    star.innerHTML =
+      '<path d="M ' + pts.join(" L ") + ' Z" fill="#111" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<text x="0" y="6" text-anchor="middle" font-size="15" font-weight="700" fill="#fff" transform="rotate(-8)">' + TXT.click + '</text>';
+  })();
+
+  // ---------- cursor ----------
+  var cursor = el("g", { opacity: "0" });
+  cursor.innerHTML =
+    '<path d="M0 0 L0 30 L8 23 L13.4 34.8 L19.6 32.1 L14.2 20.6 L25 19.4 Z" ' +
+      'fill="#fff" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/>';
+  fx.appendChild(cursor);
+  fx.appendChild(star); // star must sit above the cursor, not under it
+
+  // ---------- render ----------
+  var crankArm = $("crankArm");
+  var gateLeft = $("gateLeft");
+  var gateRight = $("gateRight");
+  var stopper = $("stopper");
+  var minis = Array.prototype.slice.call($("hopperMinis").children);
+
+  function setTileState(slot, target) {
+    if (slot.target === target) return;
+    slot.target = target;
+    slot.rect.setAttribute("fill", target ? "#111" : "#fff");
+    slot.iconBg.setAttribute("fill", target ? "#fff" : "#111");
+    slot.icon.style.color = target ? "#111" : "#fff";
+    for (var i = 0; i < slot.texts.length; i++) {
+      slot.texts[i].setAttribute("fill", target ? "#fff" : "#111");
+    }
+  }
+
+  function renderAgent(k, t) {
+    var a = t / CYCLE - k;
+    if (a < 0 || a > A_END) return;
+    var pr = PROF[mod(k, PROF.length)];
+    var A = agentGroups[pr.key];
+    A.g.style.display = "";
+
+    // spawn fully below the hopper mouth (y=240), otherwise the blank would be
+    // drawn on top of the machine's belly while it is still "inside"
+    var ax = AGENT_LAND_X, feetY = 372, alpha = 1, squash = 1, hop = 0;
+    if (a < FALL_END) {
+      var u = a / FALL_END;
+      feetY = lerp(372, BELT_TOP, easeInQuad(u));
+      alpha = smooth(clamp(a / 0.025, 0, 1));
+    } else if (a < LAND_END) {
+      feetY = BELT_TOP;
+      squash = 1 - 0.16 * Math.sin(Math.PI * seg(a, FALL_END, LAND_END));
+    } else if (a < RIDE_END) {
+      ax = lerp(AGENT_LAND_X, AGENT_CLICK_X, (a - LAND_END) / (RIDE_END - LAND_END));
+      feetY = BELT_TOP;
+    } else {
+      ax = AGENT_CLICK_X;
+      feetY = BELT_TOP;
+    }
+
+    // cartoon hop right after the merge
+    if (a >= 0.64 && a <= 0.74) {
+      hop = 22 * Math.sin(Math.PI * seg(a, 0.64, 0.74));
+    }
+
+    if (a >= EXIT_START) {
+      ax = AGENT_CLICK_X + EXIT_SPEED * (a - EXIT_START) * CYCLE;
+      feetY = BELT_TOP;
+    }
+
+    var sy = squash * (hop > 0 ? 1.06 : 1);
+    var sx = 1 + (1 - squash) * 0.55;
+    A.g.setAttribute("transform",
+      "translate(" + ax.toFixed(3) + "," + (feetY - hop).toFixed(3) + ") scale(" + sx.toFixed(4) + "," + sy.toFixed(4) + ")");
+    A.g.style.opacity = alpha.toFixed(3);
+
+    var shadow = A.g.querySelector(".shadow");
+    shadow.setAttribute("opacity", (a < FALL_END ? 0.18 + 0.37 * (a / FALL_END) : 0.55) * alpha);
+
+    // profession state
+    var merged = a >= 0.60;
+    if (A.merged !== merged) {
+      A.merged = merged;
+      var fill = merged ? "#fff" : "#ececec";
+      A.torso.setAttribute("fill", fill);
+      A.head.setAttribute("fill", fill);
+      for (var i = 0; i < A.legs.length; i++) A.legs[i].setAttribute("fill", fill);
+      A.smile.style.display = merged ? "" : "none";
+    }
+
+    var badgeScale = a >= 0.60 ? easeOutBack(seg(a, 0.60, 0.66)) : 0;
+    A.badge.style.display = badgeScale > 0 ? "" : "none";
+    A.badge.setAttribute("transform", "translate(0,-50) scale(" + badgeScale.toFixed(4) + ")");
+
+    var attrScale = a >= 0.61 ? easeOutBack(seg(a, 0.61, 0.67)) : 0;
+    A.attr.style.display = attrScale > 0 ? "" : "none";
+    A.attr.setAttribute("transform",
+      "translate(" + A.ax + "," + A.ay + ") scale(" + attrScale.toFixed(4) + ") translate(" + (-A.ax) + "," + (-A.ay) + ")");
+
+    var chipOpacity = smooth(seg(a, CHIP_P, CHIP_FULL));
+    A.chip.setAttribute("opacity", chipOpacity.toFixed(3));
+    A.chip.setAttribute("transform", "translate(0," + (-168 + (1 - chipOpacity) * 8).toFixed(2) + ")");
+  }
+
+  function render(t) {
+    var pg = t / CYCLE;
+    var p = pg - Math.floor(pg);
+    var c = Math.floor(pg);
+
+    // crank: one revolution per cycle
+    crankArm.setAttribute("transform", "rotate(" + ((pg * 360) % 360).toFixed(3) + " 405 112)");
+
+    // flaps clap once per revolution, with a short decaying bounce
+    var open = smooth(seg(p, 0, 0.06)) * (1 - smooth(seg(p, 0.10, 0.16)));
+    var tail = Math.exp(-9 * seg(p, 0.16, 0.5)) * Math.sin(34 * seg(p, 0.16, 0.5));
+    var ang = 46 * (open + 0.09 * tail);
+    gateLeft.setAttribute("transform", "translate(228,240) rotate(" + (-ang).toFixed(2) + ")");
+    gateRight.setAttribute("transform", "translate(272,240) rotate(" + ang.toFixed(2) + ")");
+
+    // hopper queue: gentle periodic bob
+    for (var m = 0; m < minis.length; m++) {
+      var ph = parseFloat(minis[m].getAttribute("data-phase"));
+      var bob = 1.6 * Math.sin(2 * Math.PI * p + ph);
+      minis[m].setAttribute("transform", "translate(0," + bob.toFixed(3) + ")");
+    }
+
+    // belt stripes: integer stripes per revolution keeps the loop exact
+    $("stripesIn").setAttribute("transform", "translate(" + mod(IN_SPEED * pg, IN_STRIPE).toFixed(3) + ",0)");
+    $("stripesOut").setAttribute("transform", "translate(" + mod(OUT_SPEED * pg, OUT_STRIPE).toFixed(3) + ",0)");
+    $("stripesFeed").setAttribute("transform", "translate(" + (-mod(FEED_SPEED * pg, FEED_STRIPE)).toFixed(3) + ",0)");
+
+    // stopper
+    var stopA = smooth(seg(p, 0.40, 0.44)) * (1 - smooth(seg(p, 0.74, 0.78)));
+    stopper.setAttribute("transform", "translate(672," + (BELT_TOP + 18 * (1 - stopA)).toFixed(3) + ")");
+    stopper.style.opacity = stopA.toFixed(3);
+
+    // feed slots
+    var takenUpTo = Math.floor(pg - CLICK_P);
+    for (var s = 0; s < slots.length; s++) {
+      var slot = slots[s];
+      var x = TILE_X0 + (slot.i - pg) * TILE_S;
+      slot.g.setAttribute("transform", "translate(" + x.toFixed(3) + ",0)");
+      var filled = slot.i >= 0 && slot.i > takenUpTo;
+      slot.tile.style.display = filled ? "" : "none";
+      var isTarget = filled && slot.i === c && p >= 0.42 && p < CLICK_P;
+      setTileState(slot, isTarget);
+      if (isTarget) {
+        slot.tile.setAttribute("transform",
+          "translate(0," + TILE_CY + ") scale(1.05) translate(0," + (-TILE_CY) + ")");
+      } else {
+        slot.tile.removeAttribute("transform");
+      }
+    }
+
+    // agents: current and previous (exit is slower than one revolution)
+    for (var key in agentGroups) agentGroups[key].g.style.display = "none";
+    renderAgent(c, t);
+    renderAgent(c - 1, t);
+
+    // flying tile
+    for (var fk in flyGroups) flyGroups[fk].style.display = "none";
+    var fu = seg(p, CLICK_P, MERGE_END);
+    if (fu > 0 && fu < 1) {
+      var fly = flyGroups[PROF[mod(c, PROF.length)].key];
+      fly.style.display = "";
+      var fy = lerp(TILE_CY, BELT_TOP - 46, easeOutCubic(fu));
+      var fs = lerp(1, 0.5, easeOutCubic(fu));
+      var fo = 1 - seg(p, 0.63, MERGE_END);
+      fly.setAttribute("transform", "translate(" + AGENT_CLICK_X + "," + fy.toFixed(3) + ") scale(" + fs.toFixed(4) + ")");
+      fly.setAttribute("opacity", fo.toFixed(3));
+    }
+
+    // cursor
+    var curA = smooth(seg(p, 0.40, 0.44)) * (1 - smooth(seg(p, 0.63, 0.68)));
+    var curU = easeInOutCubic(seg(p, 0.40, 0.545));
+    var dropU = easeInQuad(seg(p, 0.545, CLICK_P));
+    var cx = lerp(1040, CLICK_X, curU);
+    var cy = lerp(612, CLICK_Y, curU);
+    var press = 1 - 0.16 * Math.sin(Math.PI * dropU);
+    cursor.setAttribute("transform", "translate(" + cx.toFixed(2) + "," + cy.toFixed(2) + ") scale(" + (1.25 * press).toFixed(3) + ")");
+    cursor.style.opacity = curA.toFixed(3);
+
+    // comic click star
+    var su = seg(p, CLICK_P, 0.67);
+    if (su > 0 && su < 1) {
+      star.style.display = "";
+      var ss = easeOutBack(seg(p, CLICK_P, 0.60));
+      // slightly up-left of the cursor tip so the comic lettering stays readable
+      star.setAttribute("transform",
+        "translate(" + (CLICK_X - 14) + "," + (CLICK_Y - 20) + ") scale(" + ss.toFixed(4) + ")");
+      star.style.opacity = (1 - seg(p, 0.62, 0.67)).toFixed(3);
+    } else {
+      star.style.display = "none";
+    }
+  }
+
+  window.conveyorRenderAt = render;
+  window.conveyorTotal = TOTAL;
+  window.conveyorMetrics = function () {
+    var appear = CHIP_P * CYCLE;
+    var exitStart = EXIT_START * CYCLE;
+    var x0 = AGENT_CLICK_X;
+    return {
+      cycle: CYCLE,
+      total: TOTAL,
+      professions: CYCLES,
+      chipAppear: appear,
+      chipFull: CHIP_FULL * CYCLE,
+      exitStart: exitStart,
+      standWithChip: (EXIT_START - CHIP_FULL) * CYCLE,
+      fullyInsideUntil: exitStart + (1280 - CHIP_HALF - x0) / EXIT_SPEED,
+      leavesFrame: exitStart + (1280 + CHIP_HALF - x0) / EXIT_SPEED,
+      chipVisibleSeconds: exitStart + (1280 + CHIP_HALF - x0) / EXIT_SPEED - appear,
+      incomingSpeed: IN_SPEED / CYCLE,
+      outgoingSpeed: EXIT_SPEED,
+      chipHalf: CHIP_HALF,
+      agentEnd: A_END
+    };
+  };
+
+  if (RECORD) {
+    render(0);
+  } else {
+    var t0 = performance.now();
+    (function loop(now) {
+      render(((now - t0) / 1000) % TOTAL);
+      requestAnimationFrame(loop);
+    })(t0);
+  }
+})();
+</script>
+</body>
+</html>
